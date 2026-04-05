@@ -18,7 +18,10 @@ PROJECT_NAME := $(shell basename $(PROJECT_DIR))
 SRC_DIR := src
 API_DIR := api
 
-VENV_PATH := $(PROJECT_DIR)/.venv
+VENVS_DIR := $(HOME)/.venvs
+VENV_NAME := mltemplate-env
+VENV_PATH := $(VENVS_DIR)/$(VENV_NAME)
+export UV_PROJECT_ENVIRONMENT := $(VENV_PATH)
 
 IMAGE_NAME := $(PROJECT_NAME)-image
 CONTAINER_NAME := $(PROJECT_NAME)-container
@@ -52,6 +55,8 @@ print-env:  ## Print loaded environment variables
 	echo "AWS_MAIN_BUCKET_NAME=$(AWS_MAIN_BUCKET_NAME)"
 	echo "MLFLOW_TRACKING_URI=$(MLFLOW_TRACKING_URI)"
 	echo "MLFLOW_VERSION=$(MLFLOW_VERSION)"
+	echo "VENV_PATH=$(VENV_PATH)"
+	echo "UV_PROJECT_ENVIRONMENT=$(UV_PROJECT_ENVIRONMENT)"
 
 git-push:  # Push changes to Git repository
 	git reset
@@ -65,9 +70,10 @@ git-push:  # Push changes to Git repository
 # ====================================================
 
 create-env:  ## Create uv virtual environment
-	uv venv
-	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - uv virtual environment created successfully"
-	echo "source .venv/bin/activate" > .envrc
+	mkdir -p $(VENVS_DIR)
+	uv venv $(VENV_PATH)
+	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - uv virtual environment created at $(VENV_PATH)"
+	printf '%s\n' 'export UV_PROJECT_ENVIRONMENT="$$HOME/.venvs/$(VENV_NAME)"' 'source "$$UV_PROJECT_ENVIRONMENT/bin/activate"' > .envrc
 	direnv allow
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Run the following command to install dependencies:"
 	echo "  make install-dependencies"
@@ -92,16 +98,16 @@ install-dependencies:  ## Install dependencies with latest versions
 
 run-training:  ## Run the training locally
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Training locally...\n"
-	python train.py
+	uv run python train.py
 	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Local training completed successfully"
 
 run-api:  ## Run the API locally
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Running API locally...\n"
-	uvicorn $(API_DIR).main:app --host 0.0.0.0 --port 8080
+	uv run uvicorn $(API_DIR).main:app --host 0.0.0.0 --port 8080
 
 create-example-input-from-schema:  ## Create example input from schema
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Creating example input from schema..."
-	python -m $(SRC_DIR).schema
+	uv run python -m $(SRC_DIR).schema
 
 
 # ====================================================
@@ -119,13 +125,13 @@ clean:  ## Remove temporary files
 
 lint:  ## Check code quality with Ruff (without fixing)
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Checking code with Ruff..."
-	ruff check $(SRC_DIR)
+	uv run ruff check $(SRC_DIR)
 	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Code checked with Ruff"
 
 format:  ## Format Python code with Ruff (imports + formatting)
 	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Formatting code with Ruff..."
-	ruff check $(SRC_DIR) --fix
-	ruff format $(SRC_DIR)
+	uv run ruff check $(SRC_DIR) --fix
+	uv run ruff format $(SRC_DIR)
 	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Code formatted with Ruff"
 
 
@@ -136,14 +142,14 @@ format:  ## Format Python code with Ruff (imports + formatting)
 install-pre-commit:  ## Install pre-commit, only if the project is a Git repository
 	if [ -d ".git" ]; then \
 		echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Installing pre-commit..."; \
-		uv add pre-commit && pre-commit install; \
+		uv add pre-commit && uv run pre-commit install; \
 		echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Pre-commit installed"; \
 	else \
 		echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Not a Git repository, skipping pre-commit installation"; \
 	fi
 
 pre-commit:  ## Run pre-commit hooks
-	pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 
 # ====================================================

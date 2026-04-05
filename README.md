@@ -4,7 +4,7 @@
 
 1. Set the desired Python version in `.python-version`
 
-2. Create the project environment:
+2. Create the project environment (virtualenv under `~/.venvs/mltemplate-env`):
 
    ```shell
    make create-env
@@ -46,7 +46,7 @@
    Then add to `.vscode/settings.json`:
 
    ```
-   "sqlfluff.executablePath": "${workspaceFolder}/.venv/bin/sqlfluff"
+   "sqlfluff.executablePath": "${userHome}/.venvs/mltemplate-env/bin/sqlfluff"
    "sqlfluff.dialect": "athena"
    ```
 
