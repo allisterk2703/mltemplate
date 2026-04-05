@@ -18,9 +18,7 @@ PROJECT_NAME := $(shell basename $(PROJECT_DIR))
 SRC_DIR := src
 API_DIR := api
 
-VENVS_DIR := $(HOME)/.venvs
-VENV_NAME := mltemplate-env
-VENV_PATH := $(VENVS_DIR)/$(VENV_NAME)
+VENV_PATH := $(PROJECT_DIR)/.venv
 export UV_PROJECT_ENVIRONMENT := $(VENV_PATH)
 
 IMAGE_NAME := $(PROJECT_NAME)-image
@@ -69,14 +67,14 @@ git-push:  # Push changes to Git repository
 #  Virtual Environment
 # ====================================================
 
-create-env:  ## Create uv virtual environment
-	mkdir -p $(VENVS_DIR)
+create-env:  ## Create uv virtual environment (.venv in repo root) and sync from lockfile
 	uv venv $(VENV_PATH)
 	echo "$(GREEN)[SUCCESS]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - uv virtual environment created at $(VENV_PATH)"
-	printf '%s\n' 'export UV_PROJECT_ENVIRONMENT="$$HOME/.venvs/$(VENV_NAME)"' 'source "$$UV_PROJECT_ENVIRONMENT/bin/activate"' > .envrc
+	printf '%s\n' 'export UV_PROJECT_ENVIRONMENT="$$PWD/.venv"' 'source "$$UV_PROJECT_ENVIRONMENT/bin/activate"' > .envrc
+	uv sync
 	direnv allow
-	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Run the following command to install dependencies:"
-	echo "  make install-dependencies"
+	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - To refresh the lockfile and upgrade deps: make install-dependencies"
+	echo "$(BLUE)[INFO]$(NC) $$(date '+%Y-%m-%d %H:%M:%S') - Git hooks: make install-pre-commit"
 
 help-dependencies:  ## Show the list of available commands for dependencies
 	echo "$(BLUE)[INFO]$(NC) Add dependencies:"

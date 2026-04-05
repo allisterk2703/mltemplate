@@ -1,5 +1,5 @@
 {
-  "python.defaultInterpreterPath": "${userHome}/.venvs/mltemplate-env/bin/python",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   "python.terminal.activateEnvironment": false,
   "editor.tabSize": 4,
   "editor.formatOnSave": true,
