@@ -1,0 +1,17 @@
+{
+    "INTEGER_COLUMNS": [
+        "pclass",
+        "age",
+        "sibsp",
+        "parch",
+        "fare"
+    ],
+    "FLOAT_COLUMNS": [
+        "fare"
+    ],
+    "BOOL_COLUMNS": [],
+    "STRING_COLUMNS": [
+        "sex",
+        "embarked"
+    ]
+}

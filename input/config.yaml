@@ -1,0 +1,12 @@
+TARGET_COLUMN: "survived"
+PROBLEM_TYPE: "classification"
+
+COLUMNS_TO_DROP:
+  - "passengerid"
+  - "name"
+  - "ticket"
+  - "cabin"
+
+RANDOM_STATE: 42
+TEST_SIZE: 0.2
+STRATIFY: True

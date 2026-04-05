@@ -1,0 +1,7 @@
+fastapi
+minio
+mlflow
+pandas
+pydantic
+scikit-learn
+uvicorn

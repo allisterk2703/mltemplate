@@ -1,0 +1,16 @@
+{
+  "python.terminal.activateEnvironment": false,
+  "editor.tabSize": 4,
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always",
+      "source.organizeImports.ruff": "always"
+    }
+  },
+  "ruff.nativeServer": "auto",
+  "yaml.schemaStore.enable": false
+}
